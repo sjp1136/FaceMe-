@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <title>Statistics</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+    <link rel="stylesheet" href="stat_styles.css">
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
+   
+
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+
+<!-- ------------------------------RETRIEVING FROM DATABSE-------------------------------------- -->
+
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+</head>
+<body>
+ 
+<!--     <script>
+
+        function getData(){
+            firebase.ini
+
+
+        }
+
+    </script>
+
+
+
+ -->
+<!-- -------------------------------------------------GRAPHS-------------------------------------------------------------------------------- -->
+    <div class = "whole_container">
+
+       <div class = "leftHalf">
+            <div class = "state">
+                <div class= "stateDiv">
+                    <img src = "USA.png" class = "USA">
+                </div>
+                <ul style = "list-style-type: disc" class = "state0" style="font-size: 30px";> Info About Your State
+                    <li id = "state1"></li>
+                    <li id = "state2"></li>
+                    <li id = "state3"></li>
+                </ul>
+             </div>
+             <div class = "MoodDiv">
+                <p class = "BasedOn">Based On Your<br>Newsfeed..</p>
+                <div class = "MoodDesc">
+                    <p class = "beforeMood">You have a Mood Score of: </p>
+                    <p id = "MoodScore"></p>
+                    <p class = "AfterMood"><br>Which means you..</p>
+                    <p id = "actualmood"></p>
+                </div>
+             </div>
+            
+
+
+       </div>
+
+
+       <div class = "right">
+           <div class = "reactions">
+                <div class ="reactionDiv">
+                    <img src = "reactions.png" class = "reactionsPic">
+                     <div class ="allReact">
+                        <ul style = "list-style-type: disc" style = "text-align: center;" class = "reactions"> Total Amount of Reactions You've Received
+                            <li id = "likes"></li>
+                            <li id = "hearts"></li>
+                            <li id = "laugh"></li>
+                            <li id = "wow"></li>
+                            <li id = "sad"></li>
+                            <li id = "mad"></li>
+                        </ul>
+                       
+                        <ul style = "list-style-type: disc" class = "reactions"> Average Amount of Reactions You've Received
+                            <li id = "avglikes"></li>
+                            <li id = "avghearts"></li>
+                            <li id = "avglaugh"></li>
+                            <li id = "avgwow"></li>
+                            <li id = "avgsad"></li>
+                            <li id = "avgmad"></li>
+                        </ul>
+                 </div>
+                </div>
+
+            </div>
+
+           <div class = "birth_gender">
+               <div class = "birthday">
+                    <div class = "birthdayDiv">
+                        <div id="barGraph" style="height: 260px; width: 50%;" ></div>
+
+                    </div>
+                    <div class = "allBirth">
+                        <p id = "birthday"></p>
+                        <p id = "birthday1"></p>
+                        <p id = "birthday2"></p>
+                        <p id = "birthday3"></p>
+                </div>
+                 
+                 
+               </div>
+
+                <div class = "gender">
+                    <div class ="genderDiv">
+                        <div id="chartContainer" style="height: 280px; width: 100%;"></div>
+
+                    <div class = "genderBox">
+                    <ul style = "list-style-type: disc" id = "gender1">
+                        <li id = "gender2"></li>
+                        <li id = "gender3"></li>
+                    </ul>
+                </div>
+                    </div>
+
+                </div>
+            </div>
+           
+       </div>
+    </div>
+
+<script>
+      
+        var Angry;
+        var Likes;
+        var Haha;
+        var Wow;
+        var Sad;
+        var Love;
+
+        var State;
+        var Birthday;
+        var Gender;
+
+        var avgAngry;
+        var avgHaha;
+        var avgLikes;
+        var avgLove;
+        var avgSad;
+        var avgWow;
+
+     
+
+        var config = {
+        apiKey: "AIzaSyB2YeOZtkQxyH_VlNJILRJyuH5d1xw9Fqo",
+        authDomain: "faceme-e20d0.firebaseapp.com",
+        databaseURL: "https://faceme-e20d0.firebaseio.com",
+        projectId: "faceme-e20d0",
+        storageBucket: "faceme-e20d0.appspot.com",
+        messagingSenderId: "503492064024"
+        };
+        firebase.initializeApp(config);
+        database = firebase.database();
+
+        var ref = database.ref('allData');
+        var kk = ref.on('value', gotData, errData);
+    
+
+
+      
+        function ret(val){
+            Angry = val;
+        }
+
+        function gotData(data){  
+
+//      BIRTHDAY MONTHS----------------------------------------------------------------------------------
+
+        var January = ["Nicolas Cage",
+                    "Justin Timberlake",
+                    "Kim Jong-Un",
+                    "Steven Hawking",
+                    "Elvis Presley"]
+        var Feb = ["Michael Jordan",
+                    "Steve Jobs",
+                    "Ed Sheeran",
+                    "Rihanna",
+                    "Rosa Parks"];
+
+        var March= ["Albert Einstein",
+                    "Stephen Curry",
+                    "Justin Bieber",
+                    "Vincent van Gogh",
+                    "Adam Levine"
+                    ];
+
+        var April= ["Travis Scott",
+                    "Adolf Hitler",
+                    "Robert Downey Jr.",
+                    "Emma Watson",
+                    "Jackie Chan"];
+
+        var May= ["Dwayne Johnson",
+                "Mark Zuckerberg",
+                "Meek Mill",
+                "Karl Marx",
+                "Adele"];
+
+        var June= ["Elon Musk",
+                "Donald Trump",
+                "Kendrick Lamar",
+                "Morgan Freeman",
+                "Alan Turing"];
+
+        var July= ["Arnold Schwarzenegger",
+                    "Jaden Smith",
+                    "Lil Uzi Vert",
+                    "Will Ferrell",
+                    "J.K. Rowling"];
+
+        var August= ["Barack Obama",
+                    "Kobe Bryant",
+                    "Shawn Mendes",
+                    "Warren Buffet",
+                    "Usain Bolt"];
+
+        var Sept= ["Donald Glover",
+                    "Will Smith",
+                    "Lil Wayne",
+                    "Jimmy Fallon",
+                    "Adam Sandler"
+
+                    ];
+
+        var Oct= ["Vladimir Putin",
+                    "Eminem",
+                    "Bruno Mars",
+                    "Bill Gates",
+                    "Snoop Dog"];
+
+        var Nov= ["Bruce Lee",
+                "DJ Khaled",
+                "Anne Hathaway",
+                "Diplo",
+                "Miley Cyrus"];
+
+        var Dec= ["LeBron James",
+                    "Brad Pitt",
+                    "Taylor Swift",
+                    "Nicki Minaj",
+                    "Ludwig Van Beethoven"
+                    ];
+
+
+        // ------------------------------------------------------------------------------------------
+          var states = ["California",
+                        "Texas",
+                        "Florida",
+                        "New York",
+                        "Pennsylvania",
+                        "Illinois",
+                        "Ohio",
+                        "Georgia",
+                        "North Carolina",
+                        "Michigan",
+                        "New Jersey",
+                        "Virginia",
+                        "Washington",
+                        "Arizona",
+                        "Massachusetts",
+                        "Tennesee",
+                        "Indiana",
+                        "Missouri",
+                        "Maryland",
+                        "Wisconsin",
+                        "Colorado",
+                        "Minnesota",
+                        "South Carolina",
+                        "Alabama",
+                        "Louisiana",
+                        "Kentucky",
+                        "Oregon",
+                        "Oklahoma",
+                        "Connecticut",
+                        "Iowa",
+                        "Utah",
+                        "Nevada",
+                        "Arkansas",
+                        "Mississippi",
+                        "Kansas",
+                        "New Mexico",
+                        "Nebraska",
+                        "West Virginia",
+                        "Idaho",
+                        "Hawaii",
+                        "New Hampshire",
+                        "Maine",
+                        "Montana",
+                        "Rhode Island",
+                        "Delaware",
+                        "South Dakota",
+                        "North Dakota",
+                        "Alaska",
+                        "District of Columbia",
+                        "Vermont",
+                        "Wyoming"];
+        var statePop = ["39,776,830",
+                        "28,704,330",
+                        "21,312,211",
+                        "19,862,512",
+                        "12,823,989",
+                        "12,768,320",
+                        "11,694,664",
+                        "10,545,138",
+                        "10,390,149",
+                        "9,991,177",
+                        "9,032,872",
+                        "8,525,660",
+                        "7,530,552",
+                        "7,123,898",
+                        "6,895,917",
+                        "6,782,564",
+                        "6,699,629",
+                        "6,135,888",
+                        "6,079,602",
+                        "5,818,049",
+                        "5,684,203",
+                        "5,628,162",
+                        "5,088,916",
+                        "4,888,949",
+                        "4,682,509",
+                        "4,472,265",
+                        "4,199,563",
+                        "3,940,521",
+                        "3,588,683",
+                        "3,160,553",
+                        "3,159,345",
+                        "3,056,824",
+                        "3,020,327",
+                        "2,982,785",
+                        "2,918,515",
+                        "2,090,708",
+                        "1,932,549",
+                        "1,803,077",
+                        "1,753,860",
+                        "1,426,393",
+                        "1,350,575",
+                        "1,341,582",
+                        "1,062,330",
+                        "1,061,712",
+                        "971,180",
+                        "877,790",
+                        "755,238",
+                        "738,068",
+                        "703,608",
+                        "623,960",
+                        "573,720"];
+        var statePerc = ["12.13%",
+                        "8.75%",
+                        "6.50%",
+                        "6.06%",
+                        "3.91%",
+                        "3.89%",
+                        "3.57%",
+                        "3.21%",
+                        "3.17%",
+                        "3.05%",
+                        "2.75%",
+                        "2.60%",
+                        "2.30%",
+                        "2.17%",
+                        "2.10%",
+                        "2.07%",
+                        "2.04%",
+                        "1.87%",
+                        "1.85%",
+                        "1.77%",
+                        "1.73%",
+                        "1.72%",
+                        "1.55%",
+                        "1.49%",
+                        "1.43%",
+                        "1.36%",
+                        "1.28%",
+                        "1.20%",
+                        "1.09%",
+                        "0.96%",
+                        "0.96%",
+                        "0.93%",
+                        "0.92%",
+                        "0.91%",
+                        "0.89%",
+                        "0.64%",
+                        "0.59%",
+                        "0.55%",
+                        "0.53%",
+                        "0.43%",
+                        "0.41%",
+                        "0.41%",
+                        "0.32%",
+                        "0.32%",
+                        "0.30%",
+                        "0.27%",
+                        "0.23%",
+                        "0.22%",
+                        "0.21%",
+                        "0.19%",
+                        "0.17%"];
+// -----------------------------------------------------------------------------------------------------------------
+            
+            var aMoodScore = data.val().aMoodScore;
+            var strMood = aMoodScore.toString()
+            console.log(aMoodScore)
+            document.getElementById("MoodScore").innerHTML=strMood.substring(0,4)
+
+            if(aMoodScore > 0 && aMoodScore< 3){
+                document.getElementById("actualmood").innerHTML="Generally Post Positively :)"
+            }
+            else if (aMoodScore >= 3){
+                document.getElementById("actualmood").innerHTML="Post Pretty Damn Happily :)))"
+            }
+            else if (aMoodScore < 0 && aMoodScore > -3){
+                document.getElementById("actualmood").innerHTML="Generally Sad :("
+            }
+
+            else if (aMoodScore <= -3){
+                document.getElementById("actualmood").innerHTML="A realllly negative poster. You should probably stop venting on Facebook"
+            }
+
+
+
+            Angry= data.val().Angry;
+            Likes= data.val().Likes;
+            Haha=data.val().Haha;
+            Wow=data.val().Wow;
+            Sad=data.val().Sad;
+            Love=data.val().Love;
+            document.getElementById("likes").innerHTML=Likes + " Likes"
+            document.getElementById("hearts").innerHTML=Love + " Hearts"
+            document.getElementById("laugh").innerHTML=Haha + " Laughs"
+            document.getElementById("wow").innerHTML=Wow + " Wows"
+            document.getElementById("sad").innerHTML=Sad + " Sads"
+            document.getElementById("mad").innerHTML=Angry + " Angries"
+
+            avgAngry = data.val().avgAngry;
+            avgHaha = data.val().avgHaha;
+            avgLikes = data.val().avgLikes;
+            avgLove = data.val().avgLove;
+            avgSad = data.val().avgSad;
+            avgWow = data.val().avgWow;
+            console.log("WOOHOO")
+            console.log(Angry, Likes, Haha, Wow, Sad, Love);
+            console.log(avgWow,avgSad, avgLove, avgLikes, avgHaha, avgAngry)
+
+            document.getElementById("avglikes").innerHTML=avgLikes + " Likes";
+            document.getElementById("avghearts").innerHTML=avgLove + " Hearts"
+            document.getElementById("avglaugh").innerHTML=avgHaha + " Laughs"
+            document.getElementById("avgwow").innerHTML=avgWow + " Wows"
+            document.getElementById("avgsad").innerHTML=avgSad + " Sads"
+            document.getElementById("avgmad").innerHTML=avgAngry + " Angries"
+
+
+
+
+
+            State = data.val().State;
+            var stateInd = states.indexOf(State)
+            console.log(stateInd, statePop[stateInd], statePerc[stateInd])
+            document.getElementById("state1").innerHTML="You live in " + State;
+            document.getElementById("state2").innerHTML=State + " has a population of: " + statePop[stateInd] + " people";
+            document.getElementById("state3").innerHTML="The population of this State is " + statePerc[stateInd] + " of the world" ;
+
+
+            Birthday = data.val().Birthday;
+            if(Birthday == "01"){
+                document.getElementById("birthday").innerHTML="Your birthday is in January"
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=January[0] + ", " +January[1] + ", "+ January[2] +", "+  January[3] + ", "+ January[4]
+            }
+            if(Birthday == "02"){
+                document.getElementById("birthday").innerHTML="Your birthday is in February"
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=Feb[0] + ", " +Feb[1] + ", "+ Feb[2] +", "+  Feb[3] + ", "+ Feb[4]
+            }
+            if(Birthday == "03"){
+                document.getElementById("birthday").innerHTML="Your birthday is in March "
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=March[0] + ", " +March[1] + ", "+ March[2] +", "+  March[3] + ", "+ March[4]
+            }
+            if(Birthday == "04"){
+                document.getElementById("birthday").innerHTML="Your birthday is in April"
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=April[0] + ", " +April[1] + ", "+ April[2] +", "+  April[3] + ", "+ April[4]
+            }
+            if(Birthday == "05"){
+                document.getElementById("birthday").innerHTML="Your birthday is in May"
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=May[0] + ", " +May[1] + ", "+ May[2] +", "+  May[3] + ", "+ May[4]
+            }
+            if(Birthday == "06"){
+                document.getElementById("birthday").innerHTML="Your birthday is in June"
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=June[0] + ", " +June[1] + ", "+ June[2] +", "+  June[3] + ", "+ June[4]
+            }
+
+
+
+            if(Birthday == "07"){
+                console.log("IT 7")
+                document.getElementById("birthday").innerHTML="Your birthday is in July"
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=July[0] + ", " +July[1] + ", "+ July[2] +", "+  July[3] + ", "+ July[4]
+
+            }
+
+            if(Birthday == "08"){
+                document.getElementById("birthday").innerHTML="Your birthday is in August"
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=August[0] + ", " +August[1] + ", "+ August[2] +", "+  August[3] + ", "+ August[4]
+            }
+            if(Birthday == "09"){
+                document.getElementById("birthday").innerHTML="Your birthday is in September"
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=Sept[0] + ", " +Sept[1] + ", "+ Sept[2] +", "+  Sept[3] + ", "+ Sept[4]
+            }
+            if(Birthday == "10"){
+                document.getElementById("birthday").innerHTML="Your birthday is in October"
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=Oct[0] + ", " +Oct[1] + ", "+ Oct[2] +", "+  Oct[3] + ", "+ Oct[4]
+            }
+            if(Birthday == "11"){
+                document.getElementById("birthday").innerHTML="Your birthday is in November"
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=Nov[0] + ", " +Nov[1] + ", "+ Nov[2] +", "+  Nov[3] + ", "+ Nov[4]
+            }
+            if(Birthday == "12"){
+                document.getElementById("birthday").innerHTML="Your birthday is in December"
+                document.getElementById("birthday1").innerHTML=""
+                document.getElementById("birthday2").innerHTML="You share the same birth month as:"
+                document.getElementById("birthday3").innerHTML=Dec[0] + ", " +Dec[1] + ", "+ Dec[2] +", "+  Dec[3] + ", "+ Dec[4]
+            }
+
+
+
+
+
+
+
+            Gender = data.val().Gender;
+            console.log(Gender)
+            if(Gender == "male"){
+                document.getElementById("gender1").innerHTML="You are a " + "Male";
+                document.getElementById("gender2").innerHTML="You are part of 50.40% of the population";
+                document.getElementById("gender3").innerHTML="There are roughly 3,846,940,939 other Males ";
+
+            }
+            else{
+                document.getElementById("gender1").innerHTML="Female"
+                document.getElementById("gender2").innerHTML="You are part of 49.60% of the population"
+                document.getElementById("gender3").innerHTML="There are roughly 3,785,878,385 other Females"
+            }
+
+
+ 
+        
+
+
+            
+        } 
+
+
+        function errData(err){
+            console.log('Error!');
+            console.log(err);
+        }
+
+        console.log(Angry)
+    </script>
+
+
+    <script>
+window.onload = function() {
+
+var chart = new CanvasJS.Chart("chartContainer", {
+    animationEnabled: true,
+    backgroundColor: "#222222",
+    title: {
+        text: "Population of Males and Females in the World"
+    },
+    data: [{
+        type: "pie",
+        startAngle: 240,
+
+        yValueFormatString: "##0.00\"%\"",
+        indexLabel: "{label} {y}",
+        dataPoints: [
+            {y: 50.4, label: "Males"},
+            {y: 49.6, label: "Females"},
+
+        ]
+    }]
+});
+    
+var chart2 = new CanvasJS.Chart("barGraph", {
+    animationEnabled: true,
+    backgroundColor: "#222222",
+    fontColor: "white",
+    legend : {
+    fontColor: "red",
+ },
+      title:{
+        text: "Percentage of Births in the USA by Month",
+        fontColor: "white",
+      },
+
+    data: [{
+        type: "pie",
+        startAngle: 240,
+
+
+        yValueFormatString: "##0.00\"%\"",
+        indexLabel: "{label} {y}",
+        dataPoints: [
+            {y: 7.97779, label: "January"},
+            {y: 7.48402, label: "February"},
+            {y: 8.36435, label: "March"},
+            {y: 7.73191, label: "April"},
+            {y: 8.33062, label: "May"},
+            {y: 8.39870, label: "June"},
+            {y: 8.625701, label: "July"},
+            {y: 0.009073, label: "August"},
+            {y: 0.018708, label: "September"},
+            {y: 8.78458, label: "October"},
+            {y: 8.61210, label: "November"},
+            {y: 8.24821, label: "December"},
+        ]
+    }]
+});
+
+// chart.render();
+chart2.render();
+
+}
+</script>
+
+
+
+<!-- ----------------------------------PIE CHART-------------------------------------- -->
+    <script>
+    </script>
+
+
+<!-- ----------------------------------BOOTSTRAP--------------------------------------- -->
+    <nav class="navbar navbar-expand-md" style= "background-color: #222222" position= "absolute" position ="fixed">
+        <a class="navbar-brand" href="index.html" style= "color: white">faceme</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="index.html" style= "color: white">home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="statistics.html" style= "color: white">statistics</a>
+                </li>
+ 
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a id="logout" href="#" onclick="logout()" style= "color: white">Logout</a>
+                </li>
+                <p id = "a_msg"></p>
+            </ul>
+        </div>
+    </nav>
+
+
+
+
+
+        <div class="fb-login-button" id="fb-btn" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="true"
+            data-auto-logout-link="false" data-use-continue-as="false" scope="public_profile,user_posts,email,user_birthday,user_location,user_likes,user_status,user_tagged_places,user_hometown,user_gender,user_photos"
+            onlogin="checkLoginState();"></div>
+
+        <div id="profile"></div>
+        <div id="averagelikes">
+            </div>
+                <div id="feed">
+                    </div>
+                        <div id="feed2">
+                            </div>
+                                <div id="pictures">
+                                    </div>
+<!--         <p class = "statistics_txt">Statistics</p>
+        <div class = "graph1">
+        </div> -->
+    </div>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <title>faceme</title>
+    <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style media="screen">
+        #fb-btn {
+            margin-top: 20px;
+            position: absolute;
+            top: 50%;
+            vertical-align: middle;
+            left: 43%;
+        }
+
+        #profile,
+        #logout,
+        #feed,
+        #feed2,
+        #pictures,
+        #averagelikes {
+            display: none
+        }
+
+        #container {
+            text-align: center;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" /> -->
+    <link rel="shortcut icon" type="image/x-icon" href="https://i.imgur.com/5vpm7xE.png" />
+
+<script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyB2YeOZtkQxyH_VlNJILRJyuH5d1xw9Fqo",
+    authDomain: "faceme-e20d0.firebaseapp.com",
+    databaseURL: "https://faceme-e20d0.firebaseio.com",
+    projectId: "faceme-e20d0",
+    storageBucket: "faceme-e20d0.appspot.com",
+    messagingSenderId: "503492064024"
+  };
+  firebase.initializeApp(config);
+</script>
+    
+    <script type="text/javascript" src="sentimood.js"></script>
+    <script src="main.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+
+<body></body>
+
+<head></head>
+<div></div>
+
+<body>
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '170436836975111',
+                cookie: true,
+                xfbml: true,
+                version: 'v2.8'
+            });
+            FB.getLoginStatus(function (response) {
+                FB.api("/me", "GET", { fields: "id,name" }, function (response) {
+                    console.log(response);
+                });
+                statusChangeCallback(response);
+            });
+
+        };
+
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+        function checkLoginState() {
+            FB.getLoginStatus(function (response) {
+                statusChangeCallback(response);
+            });
+        }
+
+        function statusChangeCallback(response) {
+            if (response.status === 'connected') {
+                console.log('Logged in and authenicated')
+                setElements(true);
+                testAPI();
+            }
+            else {
+                console.log('Not authenicated');
+                setElements(false);
+
+            }
+        }
+
+        function testAPI() {
+
+            FB.api('/me?fields=name,email,birthday,likes,posts{picture,message},feed,location,first_name,last_name,gender,hometown,religion,relationship_status', function (response) {
+
+                if (response && !response.error) {
+                    buildProfile(response);
+                }
+                FB.api('/me/posts?fields=picture,message&limit=1000', function (response) {
+                    buildPictures(response);
+                });
+                FB.api('/me/feed?limit=1000', function (response) {
+                    var data = [];
+                    var ids = [];
+                    var avelikes = 0;
+                    if (response && !response.error) {
+                        buildFeed(response);
+                    }
+                    ids = push2(ids, response);
+                    buildLikes(ids);
+                });
+
+            });
+
+
+        }
+        function push2(ids, response) {
+            for (var i = 0; i < response.data.length; i++) {
+                ids.push(response.data[i].id);
+            }
+            return ids;
+        }
+
+
+        function buildLikes(id) {
+            var realid = '779302422144821';
+            var scopeid = '1945525608855824';
+            var accesstoken = '&access_token=EAACEdEose0cBAG2DwCyCrvbX7SEwQ15QAEeRqurQVUH6fZAVue1zZBzdnx4XbA2dzmlh0Ol46yaUI3ihokAYPfJZByaUqCNGqXR5bcUOf2Opf5dBnNZA4gBZCF7ePJmkn38DZB4JLZC3M6DQhFHpckZBmYQpM2QSffLMPLB5vkd8zkGYynWHqLJgcXx7zv8hBfdBPKoGn0mhSnqMqKo3paVo';
+            //var extension = '/likes?&summary=total_count';
+            var fields = '&fields=likes.limit(0).summary(1),reactions.type(ANGRY).limit(0).summary(total_count).as(reactions_angry),reactions.type(SAD).limit(0).summary(total_count).as(reactions_sad),reactions.type(LOVE).limit(0).summary(total_count).as(reactions_love),reactions.type(WOW).limit(0).summary(total_count).as(reactions_wow),reactions.type(HAHA).limit(0).summary(total_count).as(reactions_haha)';
+            //var fields = '&fields=likes.limit(0).summary(1)';
+            id = id.map(element => {
+                if (element.substring(0, element.indexOf('_')) === scopeid)
+                    return realid + element.substring(element.indexOf('_'), element.length);
+                return element;
+            });
+            var ids = "?ids=";
+            //Note: Limit is 50
+            var size = 50;
+            for (var i = 0; i < size; i++) {
+                if (i == size - 1)
+                    ids += id[i];
+                else
+                    ids += id[i] + ",";
+            }
+
+
+            FB.api(ids + fields + accesstoken, function (response) {
+
+                if (response && !response.error) {
+                    buildLikes2(response, id);
+                }
+            });
+        }
+        function buildLikes2(feed, id) {
+            let output = `<h3>Average Likes/Reacts</h3>`;
+            var firebaseRef = firebase.database().ref();
+            var likes = 0;
+            var angry = 0;
+            var sad = 0;
+            var love = 0;
+            var wow = 0;
+            var haha = 0;
+
+            var totalposts = 0;
+            for (var i = 0; i < id.length; i++) {
+                if (feed[id[i]] != null) {
+                    totalposts++;
+                    likes += parseInt(feed[id[i]].likes.summary.total_count);
+                    angry += parseInt(feed[id[i]].reactions_angry.summary.total_count);
+                    sad += parseInt(feed[id[i]].reactions_sad.summary.total_count);
+                    love += parseInt(feed[id[i]].reactions_love.summary.total_count);
+                    wow += parseInt(feed[id[i]].reactions_wow.summary.total_count);
+                    haha += parseInt(feed[id[i]].reactions_haha.summary.total_count);
+                }
+            }
+
+            firebaseRef.child("allData").child("Likes").set(likes);
+            firebaseRef.child("allData").child("Angry").set(angry);
+            firebaseRef.child("allData").child("Sad").set(sad);
+            firebaseRef.child("allData").child("Love").set(love);
+            firebaseRef.child("allData").child("Wow").set(wow);
+            firebaseRef.child("allData").child("Haha").set(haha);
+            likes = (Math.round(likes * 100 / totalposts) / 100).toString();
+            angry = (Math.round(angry * 100 / totalposts) / 100).toString();
+            sad = (Math.round(sad * 100 / totalposts) / 100).toString();
+            love = (Math.round(love * 100 / totalposts) / 100).toString();
+            wow = (Math.round(wow * 100 / totalposts) / 100).toString();
+            haha = (Math.round(haha * 100 / totalposts) / 100).toString();
+
+
+            
+            firebaseRef.child("allData").child("avgLikes").set(likes);
+            firebaseRef.child("allData").child("avgAngry").set(angry);
+            firebaseRef.child("allData").child("avgSad").set(sad);
+            firebaseRef.child("allData").child("avgLove").set(love);
+            firebaseRef.child("allData").child("avgWow").set(wow);
+            firebaseRef.child("allData").child("avgHaha").set(haha);
+
+            output +=
+                `<ul class="list-group">
+                    <li class="list-group-item">Likes: ${likes}</li>
+                    <li class="list-group-item">AngryReacts: ${angry}</li>
+                    <li class="list-group-item">SadReacts: ${sad}</li>
+                    <li class="list-group-item">HeartReacts: ${love}</li>
+                    <li class="list-group-item">WowReacts: ${wow}</li>
+                    <li class="list-group-item">LaughReacts: ${haha}</li>
+                </ul>`;
+            document.getElementById('averagelikes').innerHTML = output;
+
+           
+        }
+        function buildPictures(feed) {
+            let output = `<h3>All Pictures</h3>`;
+            for (let i in feed.data) {
+                if (feed.data[i].message) {
+                    output += `
+                    <li class="list-group-item">${feed.data[i].message}</li>`;
+                }
+                if (feed.data[i].picture) {
+                    output += `<img src="${feed.data[i].picture}">`;
+                }
+            }
+            document.getElementById('pictures').innerHTML = output;
+        }
+        function buildFeed2(feed) {
+            let output = `<h3>Later Posts</h3>`;
+            for (var x = 0; x < feed.length; x++) {
+                for (let i in feed[x].data.data) {
+                    if (feed[x].data.data[i].message) {
+                        output += `
+                    <li class="list-group-item">${feed[x].data.data[i].message} <span>${feed[x].data.data[i].created_time}</span> </li>`;
+                    }
+                }
+            }
+            if (output.length != 21) {
+                document.getElementById('feed2').innerHTML = output;
+
+            }
+        }
+        function buildFeed(feed) {
+            let output = `<h3>All Posts</h3>`;
+
+
+
+
+
+
+        var sentimood = new Sentimood();
+        var sentence;
+        var analysis;
+        var total = 0;
+        var total_posts = 0;
+        // console.log(analysis.score)
+
+
+
+
+
+            for (let i in feed.data) {
+                if (feed.data[i].message) {
+                    output += `
+                    <li class="list-group-item">${feed.data[i].message} <span>${feed.data[i].created_time}</span> </li>`;
+                    sentence = feed.data[i].message;
+                    analysis = sentimood.analyze(sentence);  
+                    total += analysis.score;
+                    // console.log(analysis.score))
+                    total_posts += 1;
+
+                }
+            }
+            document.getElementById('feed').innerHTML = output;
+            var firebaseRef = firebase.database().ref();
+            var amoodScore = total / total_posts;
+            console.log("MOOD SCORE IS: ", amoodScore)
+            firebaseRef.child("allData").child("aMoodScore").set(amoodScore);
+
+        }
+        function buildProfile(user) {
+            let profile = ``;
+            var firebaseRef = firebase.database().ref();
+            // console.log("MOOD SCORE IS: ", totalposts)
+            // firebaseRef.child("allData").child("total_posts").set(user.gender);
+
+            profile += `
+                <h3>User: ${user.name}</h3>
+                <ul class = "list-group">
+                    <li class = "list-group-item">First Name: ${user.first_name}</li>
+                    <li class = "list-group-item">Last Name: ${user.last_name}</li>
+                    <li class = "list-group-item">User ID: ${user.id}</li>
+                    <li class = "list-group-item">Email: ${user.email}</li>
+                </ul>`;
+
+            if (user.gender) {
+                profile += `<li class="list-group-item">Gender: ${user.gender}</li>`;
+                msg = user.gender;
+                
+                firebaseRef.child("allData").child("Gender").set(user.gender);
+            }
+            if (user.birthday) {
+                profile += `<li class="list-group-item">Birthday: ${user.birthday}</li>`;
+                dayOfBirth = user.birthday.substring(0,2);
+                firebaseRef.child("allData").child("Birthday").set(dayOfBirth);
+
+            }
+            if (user.location && user.location.name) {
+                profile += `<li class="list-group-item">Location: ${user.location.name}</li>`;
+            }
+            if (user.hometown) {
+                profile += `<li class="list-group-item">Hometown: ${user.hometown.name}</li>`;
+                hometown = user.hometown.name;
+                // console.log(typeof(hometown));
+                var state = hometown.substring(hometown.indexOf(','), hometown.length);
+                var actual_state = state.substring(2, hometown.length);
+                firebaseRef.child("allData").child("State").set(actual_state);
+
+            }
+            if (user.religion) {
+                profile += `<li class="list-group-item">Religion: ${user.religion}</li>`;
+            }
+            if (user.relationship_status) {
+                profile += `<li class="list-group-item">Hometown: ${user.relationship_status}</li>`;
+            }
+
+            profile += `<h3>Liked Pages/Groups:  </h3>`;
+            var listoflikes = [];
+            for (let i = 0; i < user.likes.data.length; i++) {
+                if (user.likes.data[i].name != null) {
+                    profile += `
+                    <li class="list-group-item">${user.likes.data[i].name} </li>`;
+                }
+
+
+            }
+
+            document.getElementById('profile').innerHTML = profile;
+
+                profile += `<div class = "graph1"></div>`
+        }
+
+
+
+
+
+        function logout() {
+            FB.logout(function (response) {
+                setElements(false);
+            })
+        }
+        function setElements(isLoggedIn) {
+            if (isLoggedIn) { 
+                document.getElementById('logout').style.display = 'block';
+                document.getElementById('profile').style.display = 'block';
+                document.getElementById('feed').style.display = 'block';
+                document.getElementById('feed2').style.display = 'block';
+                document.getElementById('averagelikes').style.display = 'block';
+                document.getElementById('pictures').style.display = 'block';
+                document.getElementById('fb-btn').style.display = 'none';
+
+            } else {
+                document.getElementById('logout').style.display = 'none';
+                document.getElementById('profile').style.display = 'none';
+                document.getElementById('feed').style.display = 'none';
+                document.getElementById('feed2').style.display = 'none';
+                document.getElementById('averagelikes').style.display = 'none';
+                document.getElementById('pictures').style.display = 'none';
+                document.getElementById('fb-btn').style.display = 'block';
+
+            }
+        }
+
+    </script>
+
+<!-- ----------------------------------BOOTSTRAP--------------------------------------- -->
+
+    <nav class="navbar navbar-expand-md" style= "background-color: #222222" position= "absolute" position ="fixed">
+        <a class="navbar-brand" href="index.html" style= "color: white">faceme</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="index.html" style= "color: white" >home
+                        <!-- <span class="sr-only">(current)</span> -->
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="statistics.html" style= "color: white">statistics</a>
+                </li>
+ 
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a id="logout" href="#" onclick="logout()" style= "color: white">Logout</a>
+                </li>
+                <p id = "a_msg"></p>
+
+
+            </ul>
+
+
+        </div>
+    </nav>
+
+
+
+    <div class="container">
+        <p class = "faceme_text">faceme</p>
+        <p class = "faceme_desc">find out more about yourself based on your facebook info</p>
+
+         <div class = "pics">
+            <img src="circle.png" class = "circle">
+            <img src="bar.png" class = "bar">
+            <img src="line.png" class = "line">
+        </div>
+
+        <div class="fb-login-button" id="fb-btn" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="true"
+            data-auto-logout-link="false" data-use-continue-as="false" scope="public_profile,user_posts,email,user_birthday,user_location,user_likes,user_status,user_tagged_places,user_hometown,user_gender,user_photos"
+            onlogin="checkLoginState();"></div>
+
+        <div id="profile"></div>
+        <div id="averagelikes">
+            </div>
+                <div id="feed">
+                    </div>
+                        <div id="feed2">
+                            </div>
+                                <div id="pictures">
+                                    </div>
+<!--         <p class = "statistics_txt">Statistics</p>
+        <div class = "graph1">
+        </div> -->
+    </div>
+
+
+
+</body>
+
+</html>
