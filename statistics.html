@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
-    <title>Statistics</title>
+    <title>statistics</title>
     <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
     <link rel="stylesheet" href="stat_styles.css">
     <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
@@ -112,12 +112,7 @@
                     <div class ="genderDiv">
                         <div id="chartContainer" style="height: 280px; width: 100%;"></div>
 
-                    <div class = "genderBox">
-                    <ul style = "list-style-type: disc" id = "gender1">
-                        <li id = "gender2"></li>
-                        <li id = "gender3"></li>
-                    </ul>
-                </div>
+                
                     </div>
 
                 </div>
@@ -556,19 +551,7 @@
 
             Gender = data.val().Gender;
             console.log(Gender)
-            if(Gender == "male"){
-                document.getElementById("gender1").innerHTML="You are a " + "Male";
-                document.getElementById("gender2").innerHTML="You are part of 50.40% of the population";
-                document.getElementById("gender3").innerHTML="There are roughly 3,846,940,939 other Males ";
-
-            }
-            else{
-                document.getElementById("gender1").innerHTML="Female"
-                document.getElementById("gender2").innerHTML="You are part of 49.60% of the population"
-                document.getElementById("gender3").innerHTML="There are roughly 3,785,878,385 other Females"
-            }
-
-
+           
  
         
 
@@ -589,25 +572,6 @@
     <script>
 window.onload = function() {
 
-var chart = new CanvasJS.Chart("chartContainer", {
-    animationEnabled: true,
-    backgroundColor: "#222222",
-    title: {
-        text: "Population of Males and Females in the World"
-    },
-    data: [{
-        type: "pie",
-        startAngle: 240,
-
-        yValueFormatString: "##0.00\"%\"",
-        indexLabel: "{label} {y}",
-        dataPoints: [
-            {y: 50.4, label: "Males"},
-            {y: 49.6, label: "Females"},
-
-        ]
-    }]
-});
     
 var chart2 = new CanvasJS.Chart("barGraph", {
     animationEnabled: true,
