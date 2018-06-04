@@ -1,9 +1,0 @@
-Statistics:
-
-Comparisons:
-Birthday compared to population, how many people have the same month of you?
-Hometown, what's the population of your hometown?
-relationship-status, how many people are of your relationship-status?
-First name - How popular is your first name?
-Last name - Origin of your last name
-How many people are female, male, etc.? - Females: 49.6%, Males: 50.4%
